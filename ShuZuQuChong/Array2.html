@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1">
+		<title>纯js数组去重</title>
+		<!--
+		<link rel="icon" href="">
+		<link rel="stylesheet" href="">
+		-->
+		<style>
+			.p1{
+				font-size: 30px;
+				text-align: center;
+				color: #fff00;
+			}
+		</style>
+	</head>
+	<body>
+		<p class="p1">使用js数组去重多种方法,通过prototype来实现</p>
+		<div>
+			<p>var arr=[1,2,2,3,3,3,1,2,2,3,3,3]去重后得到var tmp=[1,2,3]</p>
+		</div>
+	</body>
+	<script>
+	console.log("普通信息");
+	console.info("提示性信息");
+	console.error("错误信息");
+	console.warn("警示信息");
+	var arr1=[1,1,2,2,3,3,4,4,4,5,5,6,7,7,8,9];
+	var arr2=[1,1,2,2,3,3,4,4,4,5,5,6,7,7,8,9];
+	var arr3=[1,1,2,2,3,3,4,4,4,5,5,6,7,7,8,9];
+	var arr4=[1,1,2,2,3,3,4,4,4,5,5,6,7,7,8,9];
+	var tmp=[];
+	console.log("arr原数组:"+arr1);
+	console.log(arr1.length);
+	console.group("通过prototype来实现方法1");
+	console.info("-----通过prototype来实现方法1");
+	console.time("time1");
+	//console.profile("pro1");
+	Array.prototype.unique1=function(){
+		var n=[];//一个新的临时数组
+		for(var i=0;i<this.length;i++){//遍历当前数组
+			//如果当前数组的第i已经保存进了临时数组,那么跳过,否则把当前项push到临时数组里面.
+			if(n.indexOf(this[i])==-1){
+				n.push(this[i]);
+			}
+		}
+		return n;
+	}
+	//console.dir(arr);
+	tmp=arr1.unique1();
+	console.log("tmp新数组:"+tmp);
+	console.log("tmp新数组长度:"+tmp.length);
+	console.timeEnd("time1");
+	console.groupEnd();
+	//console.profileEnd("pro1");
+
+	console.group("通过prototype来实现方法2");
+	Array.prototype.unique2=function(){
+		var n=[this[0]];//结果数组;
+		for(var i=1;i<this.length;i++){//从第二项开始遍历
+			//若当前数组的第i项在当前数组中第一次出现的位置不是i,
+			//则表示第i项是重复的,忽略掉,否则存入数组.
+			if(this.indexOf(this[i])==i){
+				n.push(this[i]);
+			}
+		}
+		return n;
+	}
+	tmp=arr2.unique2();
+	console.log("tmp新数组:"+tmp);
+	console.log("tmp新数组长度:"+tmp.length);
+	console.groupEnd();	
+
+	console.group("通过prototype来实现方法3");
+	Array.prototype.unique3=function(){
+		this.sort();
+		var n=[this[0]];
+		for(var i=0;i<this.length;i++){
+			if(this[i] !=n[n.length-1]){
+				n.push(this[i])
+			}
+		}
+		return n;
+	}
+	tmp=arr3.unique3();
+	console.log("tmp新数组:"+tmp);
+	console.log("tmp新数组长度:"+tmp.length);
+	console.groupEnd();
+
+	console.group("通过prototype来实现方法4--速度最快");
+	Array.prototype.unique4=function(){
+		var n={},r=[];//n为hash表,r为临时数组
+		for(var i=0;i<this.length;i++){//遍历当前数组
+			if(!n[this[i]]){//如果hash表中没有当前项
+				n[this[i]]=true;//存入hash表
+				r.push(this[i]);//把当前数组的当前项push到临时数组.
+			}
+		}
+		return r;
+	}
+	tmp=arr4.unique4();
+	console.log("tmp新数组:"+tmp);
+	console.log("tmp新数组长度:"+tmp.length);
+	console.groupEnd();
+
+	/*(function(){
+		test1();
+		test2();
+		test3();
+	})();
+	function test1(){
+		console.log("方法1:该方法只能去除相邻相同的数组");
+		//console.log("test");
+		var arr=[1,1,2,2,3,3,4,4,4,5,5,6,7,7,8,9];
+		var tmp=[];
+		console.log("arr原数组:"+arr);
+		console.log(arr.length);
+		var j=0;
+		for(var i=0;i<arr.length;i++){
+			if(arr[i]!=arr[i+1]){
+				tmp[j]=arr[i];
+				j++;
+			}
+		}
+
+		console.log("tmp新数组:"+tmp);
+		console.log("tmp新数组的长度:"+tmp.length);
+	}
+	function test2(){
+		console.log("方法2:数组去重");
+		var arr=[3,1,2,2,3,3,3,1,2,2,3,3,3];
+		//var arr=[1,2,3,1,2,3,2,3,2,3,3,3,4,4];
+		var tmp=[];
+		var n=0;
+		var flag=false;
+		tmp[n]=arr[0];
+		console.log("arr原数组:"+arr);
+		console.log("arr原数组长度"+arr.length);
+		for(var i=1;i<arr.length;i++){
+			for(var j=0;j<=n;j++){
+				if(arr[i]!=tmp[j]){
+					flag=true;
+				}else{
+					flag=false;
+					break;
+				}
+			}
+			if(flag){
+				n++;
+				tmp[n]=arr[i];//或tmp.push(arr[i]);
+			}
+		}
+		console.log("tmp新数组:"+tmp);
+		console.log("tmp新数组的长度:"+tmp.length);
+	}
+	function test3(){
+		console.log("方法2:数组去重");
+		var arr=[3,1,2,2,3,3,3,1,2,2,3,3,3];
+		console.log("arr原数组:"+arr);
+		console.log("arr原数组长度"+arr.length);
+		var tmp=[];
+		function fun(args){
+			for(var i=0;i<args.length;i++){
+				if(tmp.indexOf(args[i])<0){//indexOf搜索数组中的元素,并返回它所在的位置.
+					tmp.push(args[i]);//push(),向数组的末尾添加一个或多个元素,并返回新的长度.
+				}
+			}
+			return tmp;
+		}
+		tmp=fun(arr);
+		console.log("tmp新数组:"+tmp);
+		console.log("tmp新数组的长度:"+tmp.length);
+	}*/
+	</script>
+</html>
